@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    #messages { list-style: none; padding: 0; }
+    #messages li { padding: 5px 10px; border-bottom: 1px solid #ddd; }
+    #form { display: flex; margin-top: 10px; }
+    #input { flex: 1; padding: 10px; }
+    #send { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Chat Room</h2>
+  <ul id="messages"></ul>
+  <form id="form">
+    <input id="input" autocomplete="off" placeholder="Type a message..." /><button id="send">Send</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  let username = '';
+
+  // Ask for username when page loads
+  while (!username) {
+    username = prompt('Enter your username:');
+  }
+
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const messages = document.getElementById('messages');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (input.value) {
+      const msg = `${username}: ${input.value}`;
+      socket.emit('chat message', msg);
+      input.value = '';
+    }
+  });
+
+  socket.on('chat message', function(msg) {
+    const item = document.createElement('li');
+    item.textContent = msg;
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+</script>
+
+</body>
+</html>
